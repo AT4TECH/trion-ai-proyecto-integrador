@@ -1,0 +1,31 @@
+# Imágenes subidas desde el sistema (no se versionan)
+assets/img/productos/*
+!assets/img/productos/.htaccess
+assets/img/empresa/*
+!assets/img/empresa/.htaccess
+
+# Configuracion local y secretos
+.env
+.env.*
+!.env.example
+config/database.php
+config/config.local.php
+*.pem
+*.key
+
+# Respaldos y archivos temporales
+*.sql
+*.sql.gz
+*.zip
+*.rar
+*.log
+*.bak
+*.tmp
+
+# Herramientas y dependencias
+/vendor/
+/node_modules/
+/.idea/
+/.vscode/
+
+
