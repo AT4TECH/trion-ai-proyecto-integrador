@@ -9,6 +9,7 @@ require_once __DIR__ . '/../models/Venta.php';
 require_once __DIR__ . '/../models/Auditoria.php';
 
 class ClienteController {
+    private const POR_PAGINA = 50;
     private PDO $db;
     private Cliente $clientes;
     public function __construct() {
@@ -17,6 +18,21 @@ class ClienteController {
     }
 
     public function listar(array $filtros): array { return $this->clientes->listar($filtros); }
+
+    public function pagina(array $filtros, int $pagina): array {
+        $total = $this->clientes->contarFiltrados($filtros);
+        $paginas = max(1, (int) ceil($total / self::POR_PAGINA));
+        $pagina = min(max($pagina, 1), $paginas);
+        $inicio = ($pagina - 1) * self::POR_PAGINA;
+
+        return [
+            'registros' => $total > 0 ? $this->clientes->listarPagina($filtros, self::POR_PAGINA, $inicio) : [],
+            'total' => $total,
+            'pagina' => $pagina,
+            'paginas' => $paginas,
+        ];
+    }
+
     public function buscar(int $id): ?array { return $this->clientes->buscar($id); }
     public function esGeneral(array $c): bool { return $c['documento']===CLIENTE_GENERAL_DOCUMENTO; }
 

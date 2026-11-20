@@ -42,4 +42,10 @@ Con DOM habilitado, prepara la instancia descartable y el vendedor del paso 4. D
 
 Desde el entorno aislado, con la copia HTTP ya iniciada, ejecuta `php tests/tarea-6/run.php auditoria-limpiar-filtros` y `php tests/tarea-6/run.php humo`. AUD-01 y AUD-02 cubren el restablecimiento desde la segunda página, resultados vacíos y la vista inicial. AUD-03 verifica búsqueda, paginación y CSV. AUD-04 comprueba redirección anónima y el 403 del vendedor.
 
+## Filtro de clientes por ciudad
+
+En una instancia descartable ya preparada con el vendedor de humo, ejecuta una vez `php tests/tarea-6/fixtures/crear-clientes.php`. El fixture verifica esquema, cuenta y marcador antes de insertar el usuario de consulta, clientes y ventas históricas sintéticas. Usa la copia descrita arriba y habilita DOM. Ejecuta `php tests/tarea-6/run.php clientes-filtro-ciudad` y luego `php tests/tarea-6/run.php humo`.
+
+Los casos CLI-01 a CLI-05 cubren coincidencia por valor completo, combinaciones con búsqueda y estado, enlaces y límites de página, restablecimiento, compras y permisos del listado.
+
 Para ampliar la suite agrega un archivo `casos/<id>.php` que devuelva un mapa ordenado de identificadores y funciones, como `casos/humo.php`. El runner identifica cada criterio en la salida sin volcar respuestas, cookies ni parámetros de acceso.

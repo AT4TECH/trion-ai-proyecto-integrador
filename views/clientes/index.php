@@ -13,11 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error ? flash('error', $error) : flash('success', $eliminar ? 'Cliente eliminado.' : 'Estado del cliente actualizado.');
     redirect('index.php');
 }
+$filtroTexto = static function (string $clave): string {
+    $valor = $_GET[$clave] ?? '';
+    return is_string($valor) ? mb_substr(trim($valor), 0, 100) : '';
+};
+$estado = $_GET['estado'] ?? '1';
 $filtros = [
-    'q' => mb_substr(trim($_GET['q'] ?? ''), 0, 100),
-    'estado' => in_array($_GET['estado'] ?? '1', ['1', '0', ''], true) ? ($_GET['estado'] ?? '1') : '1',
+    'q' => $filtroTexto('q'),
+    'estado' => in_array($estado, ['1', '0', ''], true) ? $estado : '1',
+    'ciudad' => $filtroTexto('ciudad'),
 ];
-$clientes = $controller->listar($filtros);
+$pagina = $_GET['pagina'] ?? '';
+$pagina = is_string($pagina) && preg_match('/\A[0-9]+\z/', $pagina) ? max(1, (int)$pagina) : 1;
+$resultado = $controller->pagina($filtros, $pagina);
+$clientes = $resultado['registros'];
+$enlacePagina = static fn(int $numero): string => '?' . http_build_query($filtros + ['pagina' => $numero]);
 $titulo = 'Clientes';
 require __DIR__ . '/../layouts/header.php';
 ?>
@@ -25,14 +35,15 @@ require __DIR__ . '/../layouts/header.php';
   <h1>Clientes</h1>
   <?php if (tienePermiso('clientes.crear')): ?><a class="btn" href="crear.php">+ Nuevo cliente</a><?php endif; ?>
 </div>
-<form class="filtros card" method="get">
+<form class="filtros card" method="get" action="index.php">
   <label class="grow">Buscar<input type="search" name="q" value="<?= e($filtros['q']) ?>" placeholder="Nombre, documento, teléfono o correo" autofocus></label>
+  <label>Ciudad<input type="text" name="ciudad" value="<?= e($filtros['ciudad']) ?>" maxlength="100"></label>
   <label>Estado
     <select name="estado"><?php foreach (['1' => 'Activos', '0' => 'Inactivos', '' => 'Todos'] as $k => $v): ?><option value="<?= $k ?>" <?= $filtros['estado'] === (string)$k ? 'selected' : '' ?>><?= $v ?></option><?php endforeach; ?></select>
   </label>
   <button class="btn">Filtrar</button>
 </form>
-<p class="resumen-filtro"><?= count($clientes) ?> clientes</p>
+<p class="resumen-filtro"><?= $resultado['total'] ?> clientes</p>
 <div class="table-card">
 <table class="table">
   <thead><tr><th>Cliente</th><th>Documento</th><th>Contacto</th><th>Ciudad</th><th class="num">Compras</th><th>Última compra</th><th>Estado</th><th></th></tr></thead>
@@ -62,4 +73,15 @@ require __DIR__ . '/../layouts/header.php';
   </tbody>
 </table>
 </div>
+<?php if ($resultado['paginas'] > 1): ?>
+  <nav class="paginacion" aria-label="Paginación de clientes">
+    <?php if ($resultado['pagina'] > 1): ?>
+      <a class="btn btn-light btn-sm" href="<?= e($enlacePagina($resultado['pagina'] - 1)) ?>">← Anterior</a>
+    <?php endif; ?>
+    <span>Página <?= $resultado['pagina'] ?> de <?= $resultado['paginas'] ?></span>
+    <?php if ($resultado['pagina'] < $resultado['paginas']): ?>
+      <a class="btn btn-light btn-sm" href="<?= e($enlacePagina($resultado['pagina'] + 1)) ?>">Siguiente →</a>
+    <?php endif; ?>
+  </nav>
+<?php endif; ?>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
