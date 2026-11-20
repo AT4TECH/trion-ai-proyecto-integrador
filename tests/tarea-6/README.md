@@ -25,4 +25,15 @@ El runner devuelve 0 si todas las aserciones pasan, 1 ante un fallo, 2 ante uso 
 
 `php tests/tarea-6/run.php humo --check-prerequisites` revisa solo la extensión y las variables locales. Omite todas las aserciones y devuelve 0 si están presentes o 3 si faltan. No realiza HTTP ni comprueba MySQL.
 
+## Cierre de sesión
+
+Para `logout-post-csrf`, habilita también DOM y arranca la copia descartable con su configuración de pruebas precargada para atestar incluso las respuestas tempranas de `logout.php`. Usa rutas absolutas a la copia en ambos argumentos.
+
+```powershell
+php -d display_errors=0 -d "auto_prepend_file=<directorio-padre>/sistema_ventas/config/database.php" -S 127.0.0.1:8765 -t "<directorio-padre>"
+php tests/tarea-6/run.php logout-post-csrf
+```
+
+El caso comprueba método, CSRF, sesión, cookie, auditoría y acceso posterior. Lee los conteos únicamente después de verificar la conexión descartable y usa el usuario sintético del humo. Evita ejecutar otras suites o acciones sobre el mismo usuario al medir el delta. El caso LOGOUT-04-F solicita un fallo controlado de acceso a auditoría en la copia después de atestar. Confirma el mensaje técnico en el log del servidor de pruebas y conserva únicamente el resultado sanitizado. Ejecuta también el caso `humo` contra la misma copia.
+
 Para ampliar la suite agrega un archivo `casos/<id>.php` que devuelva un mapa ordenado de identificadores y funciones, como `casos/humo.php`. El runner identifica cada criterio en la salida sin volcar respuestas, cookies ni parámetros de acceso.

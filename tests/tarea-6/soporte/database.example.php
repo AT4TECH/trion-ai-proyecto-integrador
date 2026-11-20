@@ -4,9 +4,15 @@ declare(strict_types=1);
 final class Database
 {
     private ?PDO $connection = null;
+    private static bool $verifiedRequest = false;
 
     public function getConnection(): PDO
     {
+        if (self::$verifiedRequest && ($_SERVER['SCRIPT_NAME'] ?? '') === '/sistema_ventas/public/logout.php'
+            && ($_SERVER['HTTP_X_SISTEMAVENTAS_TEST_LOGOUT_AUDIT'] ?? '') === ($_SERVER['HTTP_X_SISTEMAVENTAS_CHALLENGE'] ?? '')
+            && isset($_SERVER['HTTP_X_SISTEMAVENTAS_TEST_LOGOUT_AUDIT'])) {
+            throw new RuntimeException('Fallo de auditoría simulado por el arnés.');
+        }
         if ($this->connection !== null) {
             return $this->connection;
         }
@@ -70,6 +76,13 @@ final class Database
         }
         return $this->connection = $db;
     }
+
+    public static function attest(string $challenge): void
+    {
+        (new self())->getConnection();
+        self::$verifiedRequest = true;
+        header('X-SistemaVentas-Fixture: ' . hash_hmac('sha256', $challenge, getenv('SV_TEST_DB_MARKER')));
+    }
 }
 
 if (PHP_SAPI !== 'cli') {
@@ -79,8 +92,7 @@ if (PHP_SAPI !== 'cli') {
             throw new RuntimeException('Solicitud fuera del arnés.');
         }
         // Se ejecuta al cargar la configuración, antes de procesar el formulario.
-        (new Database())->getConnection();
-        header('X-SistemaVentas-Fixture: ' . hash_hmac('sha256', $challenge, getenv('SV_TEST_DB_MARKER')));
+        Database::attest($challenge);
     } catch (Throwable) {
         http_response_code(503);
         exit('Instancia de pruebas no verificada.');

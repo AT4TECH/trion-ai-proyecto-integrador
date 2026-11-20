@@ -22,19 +22,31 @@ final class Http
         ]);
     }
 
-    public function request(string $path, ?array $form = null): array
+    public function request(
+        string $path,
+        ?array $form = null,
+        ?string $method = null,
+        ?string $cookie = null,
+        bool $failLogoutAudit = false
+    ): array
     {
         $headers = [];
         $challenge = bin2hex(random_bytes(32));
-        curl_setopt($this->handle, CURLOPT_HTTPHEADER, ['X-SistemaVentas-Challenge: ' . $challenge]);
+        $requestHeaders = ['X-SistemaVentas-Challenge: ' . $challenge];
+        if ($failLogoutAudit) {
+            $requestHeaders[] = 'X-SistemaVentas-Test-Logout-Audit: ' . $challenge;
+        }
+        curl_setopt($this->handle, CURLOPT_HTTPHEADER, $requestHeaders);
+        curl_setopt($this->handle, CURLOPT_COOKIE, $cookie);
         curl_setopt($this->handle, CURLOPT_URL, 'http://127.0.0.1:8765/sistema_ventas/' . $path);
         curl_setopt($this->handle, CURLOPT_HEADERFUNCTION, static function ($handle, string $line) use (&$headers): int {
             if (str_contains($line, ':')) {
                 [$name, $value] = explode(':', $line, 2);
-                $headers[strtolower($name)] = trim($value);
+                $headers[strtolower($name)][] = trim($value);
             }
             return strlen($line);
         });
+        curl_setopt($this->handle, CURLOPT_CUSTOMREQUEST, $method);
         if ($form === null) {
             curl_setopt($this->handle, CURLOPT_HTTPGET, true);
         } else {
@@ -47,13 +59,15 @@ final class Http
             throw new RuntimeException('Conexión fallida con la copia HTTP descartable.');
         }
         $expected = hash_hmac('sha256', $challenge, getenv('SV_TEST_DB_MARKER'));
-        if (!hash_equals($expected, $headers['x-sistemaventas-fixture'] ?? '')) {
+        $attestations = $headers['x-sistemaventas-fixture'] ?? [];
+        if (count($attestations) !== 1 || !hash_equals($expected, $attestations[0])) {
             throw new RuntimeException('El servidor no se identificó como copia descartable.');
         }
         return [
             'status' => curl_getinfo($this->handle, CURLINFO_RESPONSE_CODE),
-            'location' => $headers['location'] ?? '',
+            'location' => $headers['location'][0] ?? '',
             'body' => $body,
+            'headers' => $headers,
         ];
     }
 }
