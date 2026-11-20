@@ -39,6 +39,7 @@ require __DIR__ . '/../layouts/header.php';
     <?php foreach ($op['acciones'] as $a): ?><option value="<?= e($a) ?>" <?= $f['accion'] === $a ? 'selected' : '' ?>><?= e(ucfirst($a)) ?></option><?php endforeach; ?></select></label>
   <label class="grow">Buscar<input type="search" name="q" value="<?= e($f['q']) ?>" placeholder="Texto en la descripción (ej. FAC-000012)"></label>
   <button class="btn">Filtrar</button>
+  <a class="btn btn-light" href="<?= e(APP_URL . '/views/auditoria/index.php') ?>">Limpiar filtros</a>
 </form>
 <div class="stats stats-compactas">
   <div class="stat"><span class="stat-label">Acciones</span><strong class="stat-value"><?= number_format((int)$resumen['total'], 0, ',', '.') ?></strong></div>

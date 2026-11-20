@@ -36,4 +36,10 @@ php tests/tarea-6/run.php logout-post-csrf
 
 El caso comprueba método, CSRF, sesión, cookie, auditoría y acceso posterior. Lee los conteos únicamente después de verificar la conexión descartable y usa el usuario sintético del humo. Evita ejecutar otras suites o acciones sobre el mismo usuario al medir el delta. El caso LOGOUT-04-F solicita un fallo controlado de acceso a auditoría en la copia después de atestar. Confirma el mensaje técnico en el log del servidor de pruebas y conserva únicamente el resultado sanitizado. Ejecuta también el caso `humo` contra la misma copia.
 
+## Limpiar filtros de auditoría
+
+Con DOM habilitado, prepara la instancia descartable y el vendedor del paso 4. Después, ejecuta una sola vez `php tests/tarea-6/fixtures/crear-auditoria.php` en esa instancia. El script verifica el esquema, los permisos y el marcador antes de crear un auditor sintético y 52 registros coincidentes del día anterior en America/Bogota, además de los controles fuera del filtro. Ejecuta los casos el mismo día de Bogotá en que preparaste el fixture.
+
+Desde el entorno aislado, con la copia HTTP ya iniciada, ejecuta `php tests/tarea-6/run.php auditoria-limpiar-filtros` y `php tests/tarea-6/run.php humo`. AUD-01 y AUD-02 cubren el restablecimiento desde la segunda página, resultados vacíos y la vista inicial. AUD-03 verifica búsqueda, paginación y CSV. AUD-04 comprueba redirección anónima y el 403 del vendedor.
+
 Para ampliar la suite agrega un archivo `casos/<id>.php` que devuelva un mapa ordenado de identificadores y funciones, como `casos/humo.php`. El runner identifica cada criterio en la salida sin volcar respuestas, cookies ni parámetros de acceso.
