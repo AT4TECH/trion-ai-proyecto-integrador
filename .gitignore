@@ -15,6 +15,8 @@ config/config.local.php
 
 # Respaldos y archivos temporales
 *.sql
+!/tests/tarea-6/fixtures/esquema.sql
+!/tests/tarea-6/fixtures/datos-sinteticos.sql
 *.sql.gz
 *.zip
 *.rar

@@ -1,0 +1,5 @@
+name = "implementador-frontend"
+description = "Implementa cambios acotados en vistas y JavaScript de SistemaVentas."
+developer_instructions = """
+Usa el plan SDD y trabaja solo en los archivos asignados. Conserva el patrón de formularios, permisos y estados vacíos. Devuelve cambios y verificaciones efectuadas.
+"""
