@@ -48,4 +48,10 @@ En una instancia descartable ya preparada con el vendedor de humo, ejecuta una v
 
 Los casos CLI-01 a CLI-05 cubren coincidencia por valor completo, combinaciones con búsqueda y estado, enlaces y límites de página, restablecimiento, compras y permisos del listado.
 
+## Stock bajo por categoría
+
+Con DOM habilitado, prepara la copia y la instancia descartable con el vendedor de humo. Ejecuta una vez `php tests/tarea-6/fixtures/crear-stock-bajo.php`. El fixture verifica el aislamiento antes de insertar los usuarios de lectura y edición, sus permisos y los datos sintéticos de stock.
+
+Con la copia HTTP iniciada, ejecuta `php tests/tarea-6/run.php stock-bajo-categoria` y `php tests/tarea-6/run.php humo`. STK-01 a STK-04 cubren selección y umbral, regresión de «Todas» e indicadores globales, entradas inválidas, resultado vacío y permisos. El modo `--check-prerequisites` comprueba el entorno local sin hacer solicitudes.
+
 Para ampliar la suite agrega un archivo `casos/<id>.php` que devuelva un mapa ordenado de identificadores y funciones, como `casos/humo.php`. El runner identifica cada criterio en la salida sin volcar respuestas, cookies ni parámetros de acceso.
