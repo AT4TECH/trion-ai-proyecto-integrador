@@ -28,7 +28,10 @@ $activo = moduloActual();
     <?php endforeach; ?>
   <?php endforeach; ?>
   </nav>
-  <a class="sidebar-logout" href="<?= BASE_URL ?>/logout.php"><?= icono('salir') ?><span>Cerrar sesión</span></a>
+  <form method="post" action="<?= e(BASE_URL . '/logout.php') ?>">
+    <?= csrfCampo() ?>
+    <button type="submit" class="sidebar-logout"><?= icono('salir') ?><span>Cerrar sesión</span></button>
+  </form>
 </aside>
 <div class="sidebar-backdrop"></div>
 <main class="app-main"><div class="container">
