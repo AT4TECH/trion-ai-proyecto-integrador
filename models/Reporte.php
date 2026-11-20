@@ -93,10 +93,16 @@ class Reporte {
         return $this->consultar("SELECT tipo,COUNT(*) movimientos,COUNT(DISTINCT id_producto) productos
             FROM movimientos_inventario WHERE ".$this->entre('fecha_movimiento')." GROUP BY tipo",$this->rango($d,$h));
     }
-    public function movimientosDetalle(string $d, string $h): array {
+    public function movimientosDetalle(string $d, string $h, string $tipo = ''): array {
+        $where = $this->entre('m.fecha_movimiento');
+        $parametros = $this->rango($d, $h);
+        if ($tipo !== '') {
+            $where .= ' AND m.tipo = :tipo';
+            $parametros['tipo'] = $tipo;
+        }
         return $this->consultar("SELECT m.fecha_movimiento,p.codigo,p.nombre,m.tipo,m.stock_anterior,m.stock_nuevo,m.motivo,m.referencia,u.nombre usuario
             FROM movimientos_inventario m INNER JOIN productos p ON p.id_producto=m.id_producto INNER JOIN usuarios u ON u.id_usuario=m.id_usuario
-            WHERE ".$this->entre('m.fecha_movimiento')." ORDER BY m.fecha_movimiento",$this->rango($d,$h));
+            WHERE ".$where." ORDER BY m.fecha_movimiento",$parametros);
     }
 
     // ---------- Devoluciones ----------

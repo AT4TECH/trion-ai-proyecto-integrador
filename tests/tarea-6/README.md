@@ -54,4 +54,10 @@ Con DOM habilitado, prepara la copia y la instancia descartable con el vendedor 
 
 Con la copia HTTP iniciada, ejecuta `php tests/tarea-6/run.php stock-bajo-categoria` y `php tests/tarea-6/run.php humo`. STK-01 a STK-04 cubren selección y umbral, regresión de «Todas» e indicadores globales, entradas inválidas, resultado vacío y permisos. El modo `--check-prerequisites` comprueba el entorno local sin hacer solicitudes.
 
+## CSV de inventario por tipo
+
+Con DOM habilitado, prepara la copia y la instancia descartables descritas arriba, incluido el vendedor de humo. Ejecuta una vez `php tests/tarea-6/fixtures/crear-reporte-inventario.php`. El fixture comprueba el aislamiento antes de insertar al lector autorizado y los movimientos sintéticos.
+
+Con la copia HTTP iniciada, ejecuta `php tests/tarea-6/run.php reporte-inventario-filtro-tipo` y `php tests/tarea-6/run.php humo`. INV-01 a INV-05 cubren el intervalo inclusivo, los tipos, los enlaces, la validación, el formato CSV, la neutralización de fórmulas, los permisos y la regresión de otro reporte. El modo `--check-prerequisites` comprueba el entorno local sin hacer solicitudes.
+
 Para ampliar la suite agrega un archivo `casos/<id>.php` que devuelva un mapa ordenado de identificadores y funciones, como `casos/humo.php`. El runner identifica cada criterio en la salida sin volcar respuestas, cookies ni parámetros de acceso.
