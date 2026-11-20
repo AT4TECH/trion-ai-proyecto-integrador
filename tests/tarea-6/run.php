@@ -25,7 +25,10 @@ if (!extension_loaded('curl') || getenv('SV_TEST_ISOLATED') !== '1'
     || !preg_match('/\A[a-f0-9]{64}\z/', $marker)) {
     $missing[] = 'Comprueba cURL, SV_TEST_ISOLATED, SV_TEST_LOGIN_PASSWORD y SV_TEST_DB_MARKER.';
 }
-if (in_array($name, ['logout-post-csrf', 'auditoria-limpiar-filtros', 'clientes-filtro-ciudad', 'stock-bajo-categoria'], true)
+if (in_array($name, [
+    'logout-post-csrf', 'auditoria-limpiar-filtros', 'clientes-filtro-ciudad',
+    'stock-bajo-categoria', 'reporte-inventario-filtro-tipo',
+], true)
     && (!extension_loaded('dom') || !extension_loaded('pdo_mysql') || !extension_loaded('mbstring')
     || !filter_var(getenv('SV_TEST_DB_PORT'), FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1024, 'max_range' => 65535],

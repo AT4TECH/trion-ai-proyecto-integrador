@@ -1,8 +1,39 @@
 <?php
 require __DIR__ . '/_inicio.php';
+$tipos = [
+    'entrada' => 'Entradas',
+    'salida' => 'Salidas (ventas y bajas)',
+    'ajuste' => 'Ajustes',
+    'devolucion' => 'Devoluciones',
+];
+$tipo = $_GET['tipo'] ?? '';
+if (!is_string($tipo) || ($tipo !== '' && !isset($tipos[$tipo]))) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    exit('Tipo de movimiento inválido.');
+}
+
 if ($exportar) {
+    // El exportador conserva este prefijo y realiza el escape estructural del CSV.
+    $textoCsv = static function (?string $texto): ?string {
+        if ($texto !== null && preg_match('/^[\p{Z}\p{Cc}\p{Cf}]*[=+\-@＝＋－＠]/u', $texto)) {
+            return "'" . $texto;
+        }
+        return $texto;
+    };
+
     exportarCsv('movimientos_inventario_' . $sufijo, ['Fecha', 'Código', 'Producto', 'Tipo', 'Stock anterior', 'Stock nuevo', 'Motivo', 'Referencia', 'Usuario'],
-        array_map(fn($m) => [$m['fecha_movimiento'], $m['codigo'], $m['nombre'], $m['tipo'], numeroCsv($m['stock_anterior']), numeroCsv($m['stock_nuevo']), $m['motivo'], $m['referencia'], $m['usuario']], $rep->movimientosDetalle()));
+        array_map(static fn(array $m): array => [
+            $m['fecha_movimiento'],
+            $textoCsv($m['codigo']),
+            $textoCsv($m['nombre']),
+            $m['tipo'],
+            numeroCsv($m['stock_anterior']),
+            numeroCsv($m['stock_nuevo']),
+            $textoCsv($m['motivo']),
+            $textoCsv($m['referencia']),
+            $textoCsv($m['usuario']),
+        ], $rep->movimientosDetalle($tipo)));
 }
 $valor = $rep->valorInventario();
 $movs = array_column($rep->movimientosPorTipo(), null, 'tipo');
@@ -10,7 +41,7 @@ $costo = array_sum(array_column($valor, 'costo'));
 $venta = array_sum(array_column($valor, 'venta'));
 $titulo = 'Reporte de inventario';
 require __DIR__ . '/../layouts/header.php';
-cabeceraReporte($rep, 'inventario', $pestanas);
+cabeceraReporte($rep, 'inventario', $pestanas, tiposMovimiento: $tipos, tipoMovimiento: $tipo);
 ?>
 <div class="stats">
   <div class="stat"><span class="stat-label">Inventario al costo</span><strong class="stat-value"><?= dinero($costo) ?></strong><span class="stat-detail">Hoy, productos activos</span></div>
@@ -25,8 +56,8 @@ cabeceraReporte($rep, 'inventario', $pestanas);
   <div class="card reporte-card">
     <h2 class="card-title">Movimientos del periodo</h2>
     <table class="table compacta"><thead><tr><th>Tipo</th><th class="num">Movimientos</th><th class="num">Productos</th></tr></thead><tbody>
-      <?php foreach (['entrada' => 'Entradas', 'salida' => 'Salidas (ventas y bajas)', 'ajuste' => 'Ajustes', 'devolucion' => 'Devoluciones'] as $k => $v): ?>
-        <tr><td><?= $v ?></td><td class="num"><?= (int)($movs[$k]['movimientos'] ?? 0) ?></td><td class="num"><?= (int)($movs[$k]['productos'] ?? 0) ?></td></tr>
+      <?php foreach ($tipos as $k => $v): ?>
+        <tr><td><?= e($v) ?></td><td class="num"><?= (int)($movs[$k]['movimientos'] ?? 0) ?></td><td class="num"><?= (int)($movs[$k]['productos'] ?? 0) ?></td></tr>
       <?php endforeach; ?>
     </tbody></table>
     <?php if (tienePermiso('inventario.ver')): ?><p class="nota"><a href="../inventario/index.php?desde=<?= e($rep->desde) ?>&hasta=<?= e($rep->hasta) ?>">Ver el kardex del periodo</a></p><?php endif; ?>
