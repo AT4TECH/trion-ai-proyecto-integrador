@@ -25,11 +25,12 @@ if (!extension_loaded('curl') || getenv('SV_TEST_ISOLATED') !== '1'
     || !preg_match('/\A[a-f0-9]{64}\z/', $marker)) {
     $missing[] = 'Comprueba cURL, SV_TEST_ISOLATED, SV_TEST_LOGIN_PASSWORD y SV_TEST_DB_MARKER.';
 }
-if ($name === 'logout-post-csrf' && (!extension_loaded('dom') || !extension_loaded('pdo_mysql') || !extension_loaded('mbstring')
+if (in_array($name, ['logout-post-csrf', 'auditoria-limpiar-filtros'], true)
+    && (!extension_loaded('dom') || !extension_loaded('pdo_mysql') || !extension_loaded('mbstring')
     || !filter_var(getenv('SV_TEST_DB_PORT'), FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1024, 'max_range' => 65535],
     ]) || (int) getenv('SV_TEST_DB_PORT') === 3306 || !getenv('SV_TEST_DB_USER') || !getenv('SV_TEST_DB_PASSWORD'))) {
-    $missing[] = 'Para cierre de sesión, comprueba DOM, PDO MySQL, mbstring, puerto aislado y cuenta descartable.';
+    $missing[] = 'Comprueba DOM, PDO MySQL, mbstring, puerto aislado y cuenta descartable.';
 }
 if ($checkOnly || $missing) {
     $reason = $missing ? implode(' ', $missing) : 'Modo de prerrequisitos locales, sin solicitudes HTTP.';
