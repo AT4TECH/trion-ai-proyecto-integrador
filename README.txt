@@ -1,18 +1,18 @@
-# SistemaVentas — Proyecto Integrador · Tarea 6
+SistemaVentas — Proyecto Integrador · Tarea 6
 
-**Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2**
+Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2**
 
-**Arnés certificado por el profesor (código FET-ARN-42)**
+Arnés certificado por el profesor (código FET-ARN-42)**
 
 > Esta frase se incluye como requisito textual del enunciado; no constituye una certificación independiente.
 
-## 1. Descripción del proyecto
+ 1. Descripción del proyecto
 
 SistemaVentas es una aplicación web desarrollada en PHP y MySQL para gestionar ventas, caja, devoluciones, productos, categorías, inventario, clientes, reportes, usuarios, roles, configuración y auditoría.
 
 El proyecto integrador aplica un arnés de desarrollo asistido por IA para implementar y verificar cinco funcionalidades mediante desarrollo guiado por especificaciones (SDD).
 
-## 2. Arquitectura
+ 2. Arquitectura
 
 - `public/`: entrada a la aplicación, autenticación y dashboard.
 - `views/`: interfaces, formularios y endpoints.
@@ -24,38 +24,37 @@ El proyecto integrador aplica un arnés de desarrollo asistido por IA para imple
 
 Las credenciales y los volcados reales de base de datos permanecen fuera del repositorio.
 
-## 3. Componentes del arnés
+ 3. Componentes del arnés
 
-### Memoria e instrucciones
+ Memoria e instrucciones
 
 `AGENTS.md` establece la arquitectura, convenciones, seguridad, límites de modificación, flujo SDD y controles previos a la entrega.
 
-### Skills
+ Skills
 
 El arnés documenta cuatro procedimientos:
 
-- **brujula-semantica**: transforma criterios de aceptación en casos de prueba verificables.
-- **planificar-sdd**: organiza las decisiones técnicas y las tareas.
-- **verificar-entrega**: comprueba el candidato mediante controles y pruebas.
-- **registrar-evidencia**: conserva los resultados y la trazabilidad del trabajo.
+- brujula-semantica**: transforma criterios de aceptación en casos de prueba verificables.
+- planificar-sdd**: organiza las decisiones técnicas y las tareas.
+- verificar-entrega**: comprueba el candidato mediante controles y pruebas.
+- registrar-evidencia**: conserva los resultados y la trazabilidad del trabajo.
 
-### Matriz Halcón
+ Matriz Halcón
 
 La relación entre roles y skills está documentada en `docs/tarea-6/matriz-halcon.md`.
 
-### Factor Ámbar
+ Factor Ámbar
 
 La complejidad se evalúa en una escala de 1 a 9, siguiendo `docs/tarea-6/factor-ambar.md`. Cada plan debe registrar su puntuación específica.
 
-## 4. Sistema de agentes
+ 4. Sistema de agentes
 
 El arnés contempla los roles de orquestador, analista de requisitos, probador, implementadores de backend y frontend, verificador, revisor de arquitectura y cronista.
 
 Los perfiles configurados se encuentran en `.codex/agents/`, y `AGENTS.md` describe las responsabilidades adicionales del orquestador y la coordinación.
 
 **Importante:** la existencia de un perfil no debe confundirse con evidencia de ejecución. Las intervenciones reales deben respaldarse con registros verificables.
-
-## 5. Flujo SDD
+ 5. Flujo SDD
 
 1. Analizar el comportamiento actual.
 2. Redactar la especificación y sus criterios de aceptación.
@@ -78,13 +77,13 @@ Los perfiles configurados se encuentran en `.codex/agents/`, y `AGENTS.md` descr
 
 Los cinco pull requests aparecen fusionados en la rama principal.
 
-## 7. Aseguramiento de la calidad
+ 7. Aseguramiento de la calidad
 
-### Mecanismo 1: análisis de sintaxis PHP
+ Mecanismo 1: análisis de sintaxis PHP
 
 El script `tools/quality/lint-php.ps1` comprueba los archivos PHP del proyecto. Se registró una ejecución con 124 archivos aprobados y cero fallos.
 
-### Mecanismo 2: pruebas HTTP automatizadas
+ Mecanismo 2: pruebas HTTP automatizadas
 
 El runner `tests/tarea-6/run.php` verifica los criterios de aceptación sobre una copia descartable de SistemaVentas y una base de datos aislada.
 
@@ -92,11 +91,11 @@ La evidencia consolidada registra **29 aserciones PASS, 0 FAIL y 0 SKIP**, inclu
 
 La preparación del entorno y los casos están documentados en `tests/tarea-6/README.md`.
 
-### Coeficiente Murciélago
+ Coeficiente Murciélago
 
-**Pendiente de completar con la valoración justificada de cada mecanismo.** No se asigna una cifra sin el criterio y la evidencia correspondientes.
+Pendiente de completar con la valoración justificada de cada mecanismo.** No se asigna una cifra sin el criterio y la evidencia correspondientes.
 
-## 8. Evidencia y trazabilidad
+ 8. Evidencia y trazabilidad
 
 - `AGENTS.md`: memoria y reglas.
 - `docs/tarea-6/matriz-halcon.md`: relación entre agentes y skills.
