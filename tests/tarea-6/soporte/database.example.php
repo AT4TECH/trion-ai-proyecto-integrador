@@ -49,7 +49,7 @@ final class Database
         }
         $grants = $db->query('SHOW GRANTS FOR CURRENT_USER')->fetchAll(PDO::FETCH_COLUMN);
         $account = '(?:`[^`]+`|\x27[^\x27]+\x27)@(?:`[^`]+`|\x27[^\x27]+\x27)\z';
-        $scope = '`sistema\\_ventas\\_tarea6\\_test`.*';
+        $scope = '`sistema_ventas_tarea6_test`.*';
         $prefix = '/\AGRANT ([A-Z, ]+) ON ' . preg_quote($scope, '/') . ' TO ';
         $scoped = false;
         foreach ($grants as $grant) {
