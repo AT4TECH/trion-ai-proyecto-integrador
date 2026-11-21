@@ -1,8 +1,8 @@
 SistemaVentas — Proyecto Integrador · Tarea 6
 
-Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2**
+Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2
 
-Arnés certificado por el profesor (código FET-ARN-42)**
+Arnés certificado por el profesor (código FET-ARN-42)
 
 > Esta frase se incluye como requisito textual del enunciado; no constituye una certificación independiente.
 
