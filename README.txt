@@ -1,37 +1,128 @@
-SistemaVentas
+# SistemaVentas — Proyecto Integrador · Tarea 6
 
-Aplicación PHP/MySQL para XAMPP. Sirve el proyecto bajo /sistema_ventas y usa
-http://localhost/sistema_ventas/public/ como entrada local. La configuración de
-base de datos y los volcados del entorno se gestionan fuera de Git. Solicita la
-configuración y el esquema aprobados para tu instalación.
+**Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2**
 
-Para instalar la conexión local, crea config/database.php en la raíz del
-proyecto, dentro de config/. Debe declarar la clase Database y ofrecer
-Database::getConnection(): PDO con una conexión MySQL al esquema autorizado.
-Obtén los parámetros de acceso por el canal aprobado y conserva ese archivo
-fuera de Git. El ejemplo tests/tarea-6/soporte/database.example.php se instala
-como config/database.php solo en la copia descartable, servida en
-http://127.0.0.1:8765/sistema_ventas/public/. La guía de pruebas explica el
-marcador, la cuenta restringida y la preparación de esa copia.
+**Arnés certificado por el profesor (código FET-ARN-42)**
 
-Módulos
-- Dashboard de ventas, caja y devoluciones del día.
-- Punto de venta, listado, detalle, anulación y factura (ticket).
-- Caja con apertura, ingresos, egresos y cierre con cuadre.
-- Devoluciones parciales o totales con reembolso y reintegro al inventario.
-- Productos, categorías, inventario (kardex, entradas, salidas y ajustes),
-  clientes, reportes, usuarios, roles, configuración y auditoría.
+> Esta frase se incluye como requisito textual del enunciado; no constituye una certificación independiente.
 
-Los permisos determinan las acciones disponibles por rol. Los cambios de
-permisos se sincronizan en las rutas protegidas sin iniciar sesión de nuevo.
+## 1. Descripción del proyecto
 
-Tarea 6 · Diplomado en Ingeniería de Software con IA y Sistemas Agénticos · Grupo 2
+SistemaVentas es una aplicación web desarrollada en PHP y MySQL para gestionar ventas, caja, devoluciones, productos, categorías, inventario, clientes, reportes, usuarios, roles, configuración y auditoría.
 
-- AGENTS.md contiene las instrucciones permanentes y el flujo SDD.
-- docs/tarea-6/matriz-halcon.md vincula los roles de Proyecto Albatros con Codex.
-- docs/tarea-6/factor-ambar.md y docs/tarea-6/plantillas/ guían cada ciclo.
-- tests/tarea-6/README.md explica cómo ejecutar lint y el caso HTTP.
-- docs/tarea-6/evidencia-arnes.md registra las verificaciones del arnés.
+El proyecto integrador aplica un arnés de desarrollo asistido por IA para implementar y verificar cinco funcionalidades mediante desarrollo guiado por especificaciones (SDD).
 
-Cada funcionalidad tendrá una rama y un PR propios. Sus artefactos SDD y
-resultados se agregarán con el cambio correspondiente.
+## 2. Arquitectura
+
+- `public/`: entrada a la aplicación, autenticación y dashboard.
+- `views/`: interfaces, formularios y endpoints.
+- `controllers/`: coordinación de operaciones.
+- `models/`: acceso a datos mediante PDO.
+- `helpers/`: autorización, CSRF y utilidades.
+- `assets/`: CSS y JavaScript.
+- `config/`: configuración local y de aplicación.
+
+Las credenciales y los volcados reales de base de datos permanecen fuera del repositorio.
+
+## 3. Componentes del arnés
+
+### Memoria e instrucciones
+
+`AGENTS.md` establece la arquitectura, convenciones, seguridad, límites de modificación, flujo SDD y controles previos a la entrega.
+
+### Skills
+
+El arnés documenta cuatro procedimientos:
+
+- **brujula-semantica**: transforma criterios de aceptación en casos de prueba verificables.
+- **planificar-sdd**: organiza las decisiones técnicas y las tareas.
+- **verificar-entrega**: comprueba el candidato mediante controles y pruebas.
+- **registrar-evidencia**: conserva los resultados y la trazabilidad del trabajo.
+
+### Matriz Halcón
+
+La relación entre roles y skills está documentada en `docs/tarea-6/matriz-halcon.md`.
+
+### Factor Ámbar
+
+La complejidad se evalúa en una escala de 1 a 9, siguiendo `docs/tarea-6/factor-ambar.md`. Cada plan debe registrar su puntuación específica.
+
+## 4. Sistema de agentes
+
+El arnés contempla los roles de orquestador, analista de requisitos, probador, implementadores de backend y frontend, verificador, revisor de arquitectura y cronista.
+
+Los perfiles configurados se encuentran en `.codex/agents/`, y `AGENTS.md` describe las responsabilidades adicionales del orquestador y la coordinación.
+
+**Importante:** la existencia de un perfil no debe confundirse con evidencia de ejecución. Las intervenciones reales deben respaldarse con registros verificables.
+
+## 5. Flujo SDD
+
+1. Analizar el comportamiento actual.
+2. Redactar la especificación y sus criterios de aceptación.
+3. Elaborar el plan y registrar el Factor Ámbar.
+4. Dividir el trabajo en tareas.
+5. Implementar en una rama específica.
+6. Ejecutar las pruebas y controles de calidad.
+7. Registrar resultados y revisar el pull request.
+8. Fusionar los cambios aprobados en `main`.
+
+## 6. Cinco funcionalidades desarrolladas
+
+| Funcionalidad | Pull request |
+|---|---|
+| Cierre de sesión seguro mediante POST y CSRF | #2 |
+| Restablecimiento de filtros de auditoría | #3 |
+| Filtro de clientes por ciudad | #4 |
+| Filtro de stock bajo por categoría | #5 |
+| Filtro del reporte de inventario por tipo de movimiento | #6 |
+
+Los cinco pull requests aparecen fusionados en la rama principal.
+
+## 7. Aseguramiento de la calidad
+
+### Mecanismo 1: análisis de sintaxis PHP
+
+El script `tools/quality/lint-php.ps1` comprueba los archivos PHP del proyecto. Se registró una ejecución con 124 archivos aprobados y cero fallos.
+
+### Mecanismo 2: pruebas HTTP automatizadas
+
+El runner `tests/tarea-6/run.php` verifica los criterios de aceptación sobre una copia descartable de SistemaVentas y una base de datos aislada.
+
+La evidencia consolidada registra **29 aserciones PASS, 0 FAIL y 0 SKIP**, incluyendo cuatro pruebas generales de humo.
+
+La preparación del entorno y los casos están documentados en `tests/tarea-6/README.md`.
+
+### Coeficiente Murciélago
+
+**Pendiente de completar con la valoración justificada de cada mecanismo.** No se asigna una cifra sin el criterio y la evidencia correspondientes.
+
+## 8. Evidencia y trazabilidad
+
+- `AGENTS.md`: memoria y reglas.
+- `docs/tarea-6/matriz-halcon.md`: relación entre agentes y skills.
+- `docs/tarea-6/factor-ambar.md`: complejidad.
+- `docs/tarea-6/evidencia-arnes.md`: verificaciones preparatorias.
+- `tests/tarea-6/README.md`: guía de pruebas.
+- `evidencia-completa-tarea6.txt`: resultados HTTP.
+- Pull requests #1–#6: integración del arnés y funcionalidades.
+
+## 9. Pendientes de verificación documental
+
+Antes de la entrega, confirmar y completar:
+
+- Las diferencias del sistema de agentes respecto al diseño del taller.
+- La evidencia de ejecución real de los agentes.
+- La puntuación Factor Ámbar de cada plan.
+- El Coeficiente Murciélago de cada mecanismo de calidad.
+- La frase «Spec revisada por el profesor» en las descripciones de los cinco PR.
+- La ubicación de las especificaciones, planes y tareas de cada funcionalidad.
+
+## 10. Ejecución local
+
+La aplicación se sirve desde XAMPP en:
+
+`http://localhost/sistema_ventas/public/`
+
+La configuración de la base de datos se instala localmente en `config/database.php` y no debe publicarse en Git.
+
+Las pruebas automatizadas utilizan un entorno descartable separado de los datos reales.
