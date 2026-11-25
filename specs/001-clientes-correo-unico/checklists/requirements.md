@@ -31,6 +31,6 @@
 
 ## Notes
 
-- Items marked complete require spec updates before `/speckit.clarify` or `/speckit.plan`
+- Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
 - Real count: 16 of 16 items satisfied
 
