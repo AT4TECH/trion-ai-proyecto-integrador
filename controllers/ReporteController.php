@@ -12,14 +12,17 @@ class ReporteController {
     public string $desde;
     public string $hasta;
     public string $error = '';
-    public function __construct(array $get) {
+    public function __construct(array $get, bool $rechazarRangoInvertido = false) {
         $this->reporte=new Reporte((new Database())->getConnection());
         $fecha=fn($v,$def) => preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)$v) && strtotime((string)$v) ? (string)$v : $def;
         $this->desde=$fecha($get['desde'] ?? '', date('Y-m-01'));
         $this->hasta=$fecha($get['hasta'] ?? '', date('Y-m-d'));
         if ($this->desde>$this->hasta) {
-            // Rango invertido: se rechaza sin intercambiar las fechas.
-            $this->error='La fecha inicial (' . $this->desde . ') no puede ser posterior a la fecha final (' . $this->hasta . ').';
+            if ($rechazarRangoInvertido) {
+                $this->error='La fecha inicial (' . $this->desde . ') no puede ser posterior a la fecha final (' . $this->hasta . ').';
+            } else {
+                [$this->desde,$this->hasta]=[$this->hasta,$this->desde];
+            }
         }
     }
     public function __call(string $metodo, array $args): mixed {

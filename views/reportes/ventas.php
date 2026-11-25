@@ -1,5 +1,15 @@
 <?php
+$reporteActual = 'ventas';
 require __DIR__ . '/_inicio.php';
+if ($rep->error !== '') {
+    // Rango invertido: mensaje comprensible; sin consultar ni exportar.
+    $titulo = 'Reporte de ventas';
+    require __DIR__ . '/../layouts/header.php';
+    cabeceraReporte($rep, 'ventas', $pestanas);
+    echo '<div class="alert">' . e($rep->error) . '</div>';
+    require __DIR__ . '/_fin.php';
+    return;
+}
 if ($exportar) {
     exportarCsv('ventas_' . $sufijo, ['Factura', 'Fecha', 'Cliente', 'Vendedor', 'Método de pago', 'Subtotal', 'Descuento', 'Impuesto', 'Total', 'Estado'],
         array_map(fn($v) => [$v['numero_factura'], $v['fecha_venta'], $v['cliente'], $v['vendedor'], $v['metodo'], numeroCsv($v['subtotal']), numeroCsv($v['descuento']), numeroCsv($v['impuesto']), numeroCsv($v['total']), $v['estado']], $rep->listadoVentas()));

@@ -6,12 +6,7 @@ require_once __DIR__ . '/../../helpers/reportes.php';
 require_once __DIR__ . '/../../helpers/funciones.php';
 require_once __DIR__ . '/../../controllers/ReporteController.php';
 requirePermission('reportes.ver');
-$rep = new ReporteController($_GET);
-if ($rep->error !== '') {
-    // Rango invertido: mensaje comprensible; sin resultados ni exportaciones.
-    echo '<div class="alert">' . e($rep->error) . '</div>';
-    exit;
-}
+$rep = new ReporteController($_GET, ($reporteActual ?? '') === 'ventas');
 $exportar = ($_GET['exportar'] ?? '') === 'csv';
 $sufijo = $rep->desde . '_a_' . $rep->hasta . '.csv';
 $pestanas = ['ventas' => 'Ventas', 'ganancias' => 'Ganancias', 'productos' => 'Productos', 'caja' => 'Caja', 'inventario' => 'Inventario', 'devoluciones' => 'Devoluciones'];
@@ -32,7 +27,7 @@ function cabeceraReporte(
         'Este mes' => [date('Y-m-01'), date('Y-m-d')], 'Mes anterior' => [date('Y-m-01', strtotime('first day of last month')), date('Y-m-t', strtotime('last month'))],
         'Este año' => [date('Y-01-01'), date('Y-m-d')]];
     ?>
-    <div class="page-header"><h1>Reportes</h1><a class="btn btn-light" href="?<?= e($qExportar) ?>"><?= icono('reportes') ?> Exportar a Excel (CSV)</a></div>
+    <div class="page-header"><h1>Reportes</h1><?php if ($rep->error === ''): ?><a class="btn btn-light" href="?<?= e($qExportar) ?>"><?= icono('reportes') ?> Exportar a Excel (CSV)</a><?php endif; ?></div>
     <nav class="tabs"><?php foreach ($pestanas as $k => $v): ?><a href="<?= $k ?>.php?<?= e($q) ?>" class="<?= $k === $actual ? 'active' : '' ?>"><?= $v ?></a><?php endforeach; ?></nav>
     <?php if ($conFechas): ?>
     <form class="filtros card" method="get">
