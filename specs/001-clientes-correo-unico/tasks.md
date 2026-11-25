@@ -19,7 +19,7 @@
 
 **Purpose**: Implementar los componentes compartidos necesarios para las historias de usuario.
 
-- [ ] T003 Implementar `Cliente::existeEmail(string $email, int $excluirId = 0): bool` en `models/Cliente.php`, utilizando una consulta PDO preparada con `CAST(LOWER(email) AS BINARY) = CAST(LOWER(:email) AS BINARY)`, exclusión mediante `id_cliente <> :id`, `LIMIT 1` y sin filtrar por estado (DR-01, FR-001, FR-002).
+- [ ] T003 Implementar `Cliente::existeEmail(string $email, int $excluirId = 0): bool` en `models/Cliente.php`, utilizando una consulta PDO preparada con `CAST(LOWER(email) AS BINARY) = CAST(LOWER(:email) AS BINARY)`, exclusión mediante `id_cliente <> :id`, `LIMIT 1` y sin filtrar por estado (DR-01, DR-02, DR-04, FR-001, FR-002).
 - [ ] T004 Implementar la protección de concurrencia en `controllers/ClienteController.php` para creación y edición mediante GET_LOCK y RELEASE_LOCK. Utilizar un nombre de bloqueo estable, compartido y específico de la base de datos, de máximo 64 caracteres, con espera de 5 segundos. Adquirir el bloqueo antes de validar y mantenerlo hasta finalizar el guardado, utilizando la misma conexión PDO. Continuar únicamente si GET_LOCK devuelve 1; en caso contrario, rechazar la operación con un mensaje comprensible y sin modificar datos. Liberar únicamente el bloqueo adquirido mediante `finally`, incluso ante errores de validación o persistencia. Evitar transacciones con lecturas anteriores a la adquisición del bloqueo (FR-007, research.md).
 
 **Checkpoint**: Componentes compartidos disponibles para implementar la validación de correos.
@@ -32,7 +32,7 @@
 
 **Independent Test**: Registrar un cliente con correo disponible y rechazar el registro con correo duplicado.
 
-- [ ] T005 [US1] Incorporar una única validación compartida en `controllers/ClienteController.php`, dentro de `validar()`, utilizando `existeEmail()` con el identificador recibido por el método: 0 para creación y el identificador actual para edición. Consultar duplicados únicamente cuando el correo no sea nulo y tenga formato válido. Conservar las validaciones existentes y utilizar el mensaje "El correo electrónico ya pertenece a otro cliente." (FR-001, FR-002, FR-003, FR-004, FR-005).
+- [ ] T005 [US1] Incorporar una única validación compartida en `controllers/ClienteController.php`, dentro de `validar()`, utilizando `existeEmail()` con el identificador recibido por el método: 0 para creación y el identificador actual para edición. Consultar duplicados únicamente cuando el correo no sea nulo y tenga formato válido. Conservar las validaciones existentes y utilizar el mensaje "El correo electrónico ya pertenece a otro cliente." (DR-05, FR-001, FR-002, FR-003, FR-004, FR-005).
 - [ ] T006 [US1] Ejecutar los escenarios V-01 y V-02 de `quickstart.md` en la base de datos aislada, verificando registro exitoso con correo disponible y rechazo de duplicados pertenecientes a clientes activos e inactivos (FR-001, FR-005, SC-001, SC-005).
 
 ---
