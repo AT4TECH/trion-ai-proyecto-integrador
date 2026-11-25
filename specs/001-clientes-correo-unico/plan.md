@@ -33,27 +33,31 @@ aislado.
 
 **Storage**: MySQL/MariaDB `sistema_ventas`; tabla `clientes` (`email VARCHAR(100) NULL`)
 
-**Testing**: Validación de sintaxis PHP obligatoria; pruebas funcionales derivadas de los criterios de aceptación (ver `quickstart.md`), ejecutadas en entorno aislado
+**Testing**: Validación de sintaxis PHP obligatoria; pruebas funcionales y concurrentes derivadas de FR-001 a FR-007 y SC-001 a SC-007, documentadas en `quickstart.md` y ejecutadas en un entorno aislado con conexiones independientes.
 
 **Target Platform**: Aplicación web PHP/MySQL (XAMPP), estructura `public/`
 
 **Project Type**: web-application MVC
 
-**Performance Goals**: N/A — búsqueda previa SELECT LIMIT 1
+**Performance Goals**: Consulta preparada SELECT LIMIT 1 para detectar duplicados. Bloqueo compartido con tiempo de espera máximo de 5 segundos para su adquisición. Si no se obtiene, se rechaza la operación sin modificar los datos.
 
-**Constraints**: Sin cambios de esquema ni datos preexistentes; cambios mínimos en capa de modelo/controlador
+**Constraints**: Sin cambios de esquema ni modificaciones automáticas de registros preexistentes; cambios mínimos en las capas de modelo y controlador. La protección de concurrencia se aplica a las operaciones de creación y edición que utilizan el mecanismo de bloqueo compartido.
 
-**Scale/Scope**: Módulo de clientes existente; sin contratos externos
+**Scale/Scope**: Módulo de clientes existente; sin contratos externos.
+
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- Conservación de la arquitectura PHP 8.2 — MySQL — MVC — PDO: se modifica `models/Cliente.php` y `controllers/ClienteController.php` (capas existentes); sin nuevos archivos de capa.
-- Seguridad: validación del lado del servidor ya existente conservada; mensaje de error comprensible agregado (FR-005); sin nueva salida sin escape.
-- Cambios mínimos y compatibilidad: comprobación de duplicados previa al INSERT/UPDATE; sin modificación ni eliminación de registros preexistentes (FR-006).
-- Desarrollo SDD con trazabilidad: artefactos en `specs/001-clientes-correo-unico/`.
-- Verificación con pruebas reales en entorno aislado: pruebas funcionales derivadas de los criterios de aceptación de la especificación.
+- Conservación de la arquitectura PHP 8.2, MySQL/MariaDB, MVC y PDO: se modifican las capas existentes de modelo y controlador.
+- Seguridad: se conservan la validación del lado del servidor, las consultas preparadas PDO, la protección CSRF y el escape de las salidas.
+- Cambios mínimos y compatibilidad: se conservan las validaciones existentes, los formatos de retorno y el registro de auditoría. No se modifica el esquema ni se alteran automáticamente los registros preexistentes.
+- Integridad de los datos: protección contra asignaciones duplicadas de correo durante operaciones concurrentes, con tiempo de espera limitado y liberación del bloqueo incluso ante errores (FR-007).
+- Desarrollo SDD con trazabilidad: artefactos en specs/001-clientes-correo-unico/, vinculados con FR-001 a FR-007 y SC-001 a SC-007.
+- Verificación en entorno aislado: validación de sintaxis PHP, pruebas funcionales y pruebas concurrentes con conexiones independientes.
+
+**Resultado de la revisión de diseño**: compatible con los principios de la constitución. El cumplimiento efectivo deberá comprobarse durante la implementación y las pruebas.
 
 ## Project Structure
 
