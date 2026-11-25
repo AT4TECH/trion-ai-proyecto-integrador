@@ -1,4 +1,4 @@
-﻿# Quickstart — Correos electrónicos únicos en el módulo de clientes
+# Quickstart — Correos electrónicos únicos en el módulo de clientes
 
 Validación funcional y concurrente derivada de los requisitos y criterios de aceptación de `specs/001-clientes-correo-unico/spec.md`.
 
@@ -124,3 +124,61 @@ Durante la implementación se documentará para cada escenario:
 - Evidencia y observaciones.
 
 No se considerará aprobada ninguna prueba sin haberla ejecutado.
+## Registro de resultados reales (T021)
+
+Fecha: 2026-11-25 04:04:54
+Entorno: PHP 8.2.12 (cli), MariaDB 10.4.32, base de datos aislada \sistema_ventas_iso\ (importada desde \database.sql\). Verificado: la base original \sistema_ventas\ sin modificaciones (recuento 1 antes y 1 después).
+
+Verificación de sintaxis (T002/T021): \models/Cliente.php\ — "No syntax errors detected"; \controllers/ClienteController.php\ — "No syntax errors detected".
+
+Escenarios ejecutados contra la base aislada (resultados reportados por el ejecutor, con cobertura parcial):
+
+- V-01: PASS — Creación de cliente con correo válido y disponible (crear ok: [2,[]]).
+- V-02: PASS — Rechazo de duplicado al registrar (activo).
+- V-02b: PASS — Rechazo de duplicado al registrar (propietario inactivo).
+- V-03: PASS — Edición conservando el correo propio ({"r":[],"email":"v01@ejemplo.com"}).
+- V-04: PASS — Rechazo de correo de otro cliente en edición; V-04b: PASS — sin cambio: "v03b@ejemplo.com".
+- V-05: PASS — Edición dejando el correo vacío ({"r":[],"email":null}).
+- V-06: PASS — Rechazo de correo inválido en edición.
+- V-07: PASS — Duplicado detectado por diferencia de caja.
+- V-08: PASS — Rechazo a propietario inactivo.
+- V-09: PASS — Registro sin correo (sin correo ok: [4,[]]).
+- V-10: PASS — Rechazo de correo inválido en creación.
+- V-11: PASS — Rechazo conservar duplicado preexistente.
+- V-12: PASS — Corrección a correo disponible ([]).
+- V-13: PASS — Dejar vacío un correo con duplicado preexistente ([]).
+- V-17: PASS — Edición con correo válido y disponible ([]).
+- V-18: PASS — Correo con tilde se considera distinto.
+- V-18-b: PASS — Diferencia de caja detectada como duplicado.
+- V-14-setup: PASS — Adquisición del bloqueo por la conexión A (creación/creación).
+- V-15: PASS — Rechazo al intentar crear mientras A tiene el bloqueo.
+- V-14b: PASS — No se creó mientras el bloqueo estaba adquirido.
+- V-16-a: PASS — Liberación manual por la conexión A.
+- V-14-d: PASS — Creación exitosa tras liberar el bloqueo (creación/creación).
+- V-14-setup2: PASS — Adquisición del bloqueo (creación/edición).
+- V-14-c: PASS — Rechazo al intentar editar mientras A tiene el bloqueo.
+- V-14-e: PASS — Edición exitosa tras liberar el bloqueo (creación/edición).
+- V-14-setup3: PASS — Adquisición del bloqueo (edición/edición).
+- V-14-f: PASS — Rechazo al intentar editar (edición/edición).
+- V-14-g: PASS — Edición exitosa tras liberar el bloqueo (edición/edición).
+- V-16b-pre: PASS — Error de validación esperado ([0,["El nombre es obligatorio..."]]).
+- V-16-c: PASS — Liberación tras error de validación.
+- V-16-d: PASS — Excepción de persistencia simulada ("Simulado error de persistencia").
+- V-16-e: PASS — Liberación tras error de persistencia.
+- V-19: PASS — Auditoría conservada (before 4, after 5).
+- ISO_ISOLATION: PASS — Base original sin modificaciones (before=1 after=1).
+
+RESUMEN: PASS=35 FAIL=0 TOTAL=35
+
+## Revisión humana de los resultados
+
+- El ejecutor reportó 35 comprobaciones aprobadas y ninguna fallida.
+- Se detectó y corrigió manualmente el BOM UTF-8 introducido durante la implementación.
+- Los tres archivos PHP nuevos o modificados superaron la validación de sintaxis mediante php -l.
+- V-14: se comprobó la contención del bloqueo, pero quedan pendientes las operaciones simultáneas reales.
+- V-16: se comprobó la liberación ante una excepción simulada de persistencia. Queda pendiente verificarla desde una conexión independiente.
+- V-19: se comprobó el registro de auditoría en creación. Quedan pendientes las verificaciones integrales de seguridad y regresión.
+- Las tareas T019, T020 y T021 permanecen abiertas hasta completar sus verificaciones.
+- El recuento de clientes de la base original permaneció igual antes y después de las pruebas. Esta comprobación no demuestra por sí sola la integridad de todos sus datos.
+
+Los resultados parciales no constituyen una aprobación integral de todos los escenarios de aceptación.

@@ -72,6 +72,11 @@ class Cliente {
         $s=$this->db->prepare("SELECT 1 FROM clientes WHERE documento=:d AND id_cliente<>:id LIMIT 1");
         $s->execute(['d'=>$documento,'id'=>$excluirId]); return (bool)$s->fetchColumn();
     }
+    public function existeEmail(string $email, int $excluirId=0): bool {
+        $s=$this->db->prepare("SELECT 1 FROM clientes WHERE CAST(LOWER(email) AS BINARY)=CAST(LOWER(:email) AS BINARY) AND id_cliente<>:id LIMIT 1");
+        $s->execute(['email'=>$email,'id'=>$excluirId]); return (bool)$s->fetchColumn();
+    }
+
     public function crear(array $d): int {
         $this->db->prepare("INSERT INTO clientes (documento,nombre,telefono,email,direccion,ciudad)
             VALUES (:documento,:nombre,:telefono,:email,:direccion,:ciudad)")->execute($d);

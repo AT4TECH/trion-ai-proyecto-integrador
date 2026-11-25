@@ -42,25 +42,38 @@ class ClienteController {
         $ventas=(new Venta($this->db))->listar(['desde'=>'2000-01-01','hasta'=>date('Y-m-d'),'id_cliente'=>$id,'id_usuario'=>$propias]);
         return ['resumen'=>$this->clientes->resumenCompras($id,$propias),'ventas'=>array_slice($ventas,0,10),'solo_propias'=>(bool)$propias];
     }
-
-    // Devuelve [id, errores].
+        // Devuelve [id, errores].
     public function crear(array $post): array {
-        [$d,$errores]=$this->validar($post,0);
-        if ($errores) return [0,$errores];
-        $id=$this->clientes->crear($d);
-        (new Auditoria($this->db))->registrar('clientes','crear','clientes',$id,"Cliente {$d['nombre']}".($d['documento'] ? " ({$d['documento']})" : ''));
-        return [$id,[]];
+        $lockName=$this->obtenerLockClientes();
+        if (!$this->adquirirLockClientes($lockName)) return [0,['El bloqueo de concurrencia no está disponible; intente más tarde.']];
+        try {
+            [$d,$errores]=$this->validar($post,0);
+            if ($errores) return [0,$errores];
+            $id=$this->clientes->crear($d);
+            (new Auditoria($this->db))->registrar('clientes','crear','clientes',$id,"Cliente {$d['nombre']}".($d['documento'] ? " ({$d['documento']})" : ''));
+            return [$id,[]];
+        } finally {
+            $this->liberarLockClientes($lockName);
+        }
     }
+
     public function actualizar(int $id, array $post): array {
-        $actual=$this->clientes->buscar($id);
-        if (!$actual) return ['El cliente no existe.'];
-        [$d,$errores]=$this->validar($post,$id);
-        if ($this->esGeneral($actual) && $d['documento']!==CLIENTE_GENERAL_DOCUMENTO) $errores[]='No se puede cambiar el documento del Cliente General.';
-        if ($errores) return $errores;
-        $this->clientes->actualizar($id,$d);
-        (new Auditoria($this->db))->registrar('clientes','editar','clientes',$id,"Cliente {$d['nombre']}");
-        return [];
+        $lockName=$this->obtenerLockClientes();
+        if (!$this->adquirirLockClientes($lockName)) return ['El bloqueo de concurrencia no está disponible; intente más tarde.'];
+        try {
+            $actual=$this->clientes->buscar($id);
+            if (!$actual) return ['El cliente no existe.'];
+            [$d,$errores]=$this->validar($post,$id);
+            if ($this->esGeneral($actual) && $d['documento']!==CLIENTE_GENERAL_DOCUMENTO) $errores[]='No se puede cambiar el documento del Cliente General.';
+            if ($errores) return $errores;
+            $this->clientes->actualizar($id,$d);
+            (new Auditoria($this->db))->registrar('clientes','editar','clientes',$id,"Cliente {$d['nombre']}");
+            return [];
+        } finally {
+            $this->liberarLockClientes($lockName);
+        }
     }
+
     public function cambiarEstado(int $id): string {
         $c=$this->clientes->buscar($id);
         if (!$c) return 'El cliente no existe.';
@@ -98,7 +111,30 @@ class ClienteController {
             elseif ($this->clientes->existeDocumento($d['documento'],$id)) $e[]="Ya existe un cliente con el documento {$d['documento']}.";
         }
         if ($d['telefono']!==null && !preg_match('/^[0-9+()\s\-]{7,30}$/',$d['telefono'])) $e[]='El teléfono no es válido.';
-        if ($d['email']!==null && !filter_var($d['email'],FILTER_VALIDATE_EMAIL)) $e[]='El correo electrónico no es válido.';
+        if ($d['email']!==null) {
+            if (!filter_var($d['email'],FILTER_VALIDATE_EMAIL)) $e[]='El correo electrónico no es válido.';
+            elseif ($this->clientes->existeEmail($d['email'],$id)) $e[]='El correo electrónico ya pertenece a otro cliente.';
+        }
+
         return [$d,$e];
+    }
+
+
+    // Nombre de bloqueo compartido entre creación y edición; específico de la base de datos.
+    private function obtenerLockClientes(): string {
+        $dbName=(string)$this->db->query('SELECT DATABASE()')->fetchColumn();
+        return 'sv_clientes_'.substr($dbName,0,48);
+    }
+
+    // Adquiere el bloqueo compartido con tiempo de espera de 5 segundos; devuelve true solo si se logró.
+    private function adquirirLockClientes(string $lockName): bool {
+        $s=$this->db->prepare('SELECT GET_LOCK(:lock,5)');
+        $s->execute(['lock'=>$lockName]);
+        return (int)$s->fetchColumn()===1;
+    }
+
+    private function liberarLockClientes(string $lockName): void {
+        $s=$this->db->prepare('SELECT RELEASE_LOCK(:lock)');
+        $s->execute(['lock'=>$lockName]);
     }
 }
