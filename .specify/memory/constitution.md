@@ -1,50 +1,96 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- SYNC IMPACT REPORT
+- Version change: N/A -> 1.0.0 (first ratified version; the scaffold carried no version)
+- Modified principles: I (reformulada), II (ampliada: consultas preparadas y parametrizadas
+  cuando intervengan datos variables; escape de salidas según contexto), III (conservada),
+  IV (actualizada: rutas specs/<funcionalidad>), V (actualizada: validación de sintaxis PHP
+  + pruebas funcionales derivadas de criterios de aceptación, entorno aislado)
+- Added sections: "Restricciones y Estándares de la Stack", "Flujo de Calidad y Trabajo", Governance rules
+- Removed sections: none
+- Follow-up TODOs: Ratificación inicial autorizada por el usuario el 2026-11-24.
+-->
+
+# SistemaVentas Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Conservación de la arquitectura PHP 8.2 — MySQL — MVC — PDO
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+SistemaVentas DEBE permanecer una aplicación PHP 8.2 con MySQL/MariaDB, arquitectura MVC y
+acceso a datos mediante PDO. Los niveles y prácticas declarativas observados DEBEN conservarse:
+`declare(strict_types=1)`, tipado de propiedades y PDO con `ATTR_EMULATE_PREPARES => false`.
+Los directorios `public/`, `controllers/`, `models/`, `views/`, `helpers/`, `config/` y `assets/`
+DEBEN conservar su separación de responsabilidades; conservar las rutas, capas y
+comportamientos existentes que no formen parte de la funcionalidad especificada.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Seguridad: autorización, validación del lado del servidor, CSRF, consultas preparadas y parametrizadas, escape de salidas según contexto
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Toda operación de escritura DEBE requerir autorización del lado del servidor
+(helpers/permisos.php: tienePermiso, requirePermission; ROL_ADMINISTRADOR) y validación del
+lado del servidor con patrones de validación observados (ejemplo: UsuarioController::validar).
+Los formularios POST DEBEN estar protegidos contra CSRF según el entorno observado
+(verificarCsrf()/csrfCampo() con hash_equals, helpers/funciones.php). Todas las consultas que
+involucren datos variables DEBEN ser preparadas con PDO, pasando los parámetros como variables
+vinculadas (nombrados o posicionales según convenga), sin interpolación de variables en la
+sentencia. Toda salida de datos DEBE escaparse según su contexto (según el entorno observado,
+con e() para texto HTML: htmlspecialchars, ENT_QUOTES, UTF-8). Las credenciales y los datos
+reales DEBEN permanecer fuera de Git (.gitignore).
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Cambios mínimos y compatibilidad con el comportamiento existente
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Los cambios DEBEN limitarse al alcance de la funcionalidad especificada. No debe romperse ni
+modificarse comportamientos existentes fuera de ese alcance. Las transacciones existentes
+(beginTransaction en los controladores que las usan) DEBEN conservarse.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Desarrollo dirigido por especificaciones con trazabilidad
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Toda funcionalidad DEBE desarrollarse con SDD: especificación con criterios de aceptación,
+planificación, tareas y evidencia real. Cada funcionalidad DEBE mantener sus artefactos en su
+propio directorio de specs nativo, bajo specs/<funcionalidad>/ (estructura nativa de Spec Kit
+1.4.4). DEBE existir trazabilidad entre requisitos, planificación, tareas y pruebas.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Verificación mediante pruebas reales en un entorno seguro
+
+Las verificaciones DEBEN ejecutarse sobre un entorno aislado: copia del sistema y base de
+datos sintética o descartable, sin datos reales. Validación de sintaxis PHP obligatoria; se
+requieren pruebas funcionales derivadas de los criterios de aceptación de cada nueva
+especificación, ejecutadas en el entorno aislado. Los resultados registrados DEBEN ser
+resultados reales y verificables. Un resultado solo es válido si una prueba lo demuestra
+realmente.
+
+## Restricciones y Estándares de la Stack
+
+- **Stack técnico:** PHP 8.2, MySQL/MariaDB compatible con XAMPP; arquitectura MVC; PDO con
+  consultas preparadas.
+- **Protección de datos:** config/database.php, *.env, claves y credenciales DEBEN permanecer
+  fuera de Git (.gitignore); datos reales DEBEN usarse solo fuera de los entornos de prueba.
+- **Validación y pruebas:** validación de sintaxis PHP obligatoria; pruebas funcionales
+  derivadas de los criterios de aceptación de cada especificación, ejecutadas en un entorno
+  aislado. Resultados registrados únicamente reales.
+- **Convenciones:** timezone America/Bogota (config/config.php); permisos de rol con
+  ROL_ADMINISTRADOR; transacciones mediante PDO beginTransaction.
+
+## Flujo de Calidad y Trabajo
+
+- **Flujo SDD:** analizar el comportamiento actual; redactar especificación y criterios de
+  aceptación; planificar; dividir en tareas; implementar; ejecutar pruebas; registrar resultados
+  reales (specs/<funcionalidad>/).
+- **Revisión:** los artefactos generados DEBEN revisarse antes de avanzar a la siguiente fase;
+  el diff debe coincidir con la especificación.
+- **Gates de calidad:** validación de sintaxis PHP sin fallos; pruebas funcionales derivadas
+  de los criterios de aceptación, ejecutadas en entorno aislado; registrar únicamente
+  resultados reales.
+- **Rama de trabajo:** desarrollo exclusivo en recuperacion/triana; sin fusiones, publicación
+  ni pull requests sin autorización del usuario.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- **Procedimiento de enmienda:** las modificaciones a esta constitución DEBEN documentarse
+  (Sync Impact Report: old→new, principios añadidos o eliminados, secciones añadidas o
+  eliminadas) antes de aplicarse.
+- **Versionado:** SEMVER — MAJOR: cambios incompatibles de gobernanza o redefiniciones de
+  principios; MINOR: nuevos principios o secciones añadidos; PATCH: aclaraciones y retoques
+  sin efecto semántico.
+- **Cumplimiento:** la planificación y los pull requests DEBEN verificar cada funcionalidad
+  contra los principios vigentes y la versión de la constitución en uso.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
