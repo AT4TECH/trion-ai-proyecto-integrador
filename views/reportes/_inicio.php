@@ -3,9 +3,15 @@
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../helpers/permisos.php';
 require_once __DIR__ . '/../../helpers/reportes.php';
+require_once __DIR__ . '/../../helpers/funciones.php';
 require_once __DIR__ . '/../../controllers/ReporteController.php';
 requirePermission('reportes.ver');
 $rep = new ReporteController($_GET);
+if ($rep->error !== '') {
+    // Rango invertido: mensaje comprensible; sin resultados ni exportaciones.
+    echo '<div class="alert">' . e($rep->error) . '</div>';
+    exit;
+}
 $exportar = ($_GET['exportar'] ?? '') === 'csv';
 $sufijo = $rep->desde . '_a_' . $rep->hasta . '.csv';
 $pestanas = ['ventas' => 'Ventas', 'ganancias' => 'Ganancias', 'productos' => 'Productos', 'caja' => 'Caja', 'inventario' => 'Inventario', 'devoluciones' => 'Devoluciones'];
